@@ -31,7 +31,7 @@ The name comes from:
 
 **Screenshot:**
 
-![img](https://raw.githubusercontent.com/sissbruecker/linkding/master/docs/public/linkding-screenshot-zh.png)
+![img](https://raw.githubusercontent.com/chensoul/linkding/master/docs/public/linkding-screenshot-zh.png)
 
 ### Getting Started
 
