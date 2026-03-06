@@ -116,32 +116,9 @@
 
 ## 阶段三：高难度功能（预估 6–12 天）
 
-### 7. 回收站
+### 7. Bundle 二级过滤器与 search_params
 
-**难度**：高 | **依赖**：无
-
-| 步骤 | 操作 | 涉及文件 |
-|------|------|----------|
-| 1 | Bookmark 增加 `is_deleted`、`date_deleted` | [bookmarks/models.py](bookmarks/models.py) |
-| 2 | 数据库迁移 | `bookmarks/migrations/` |
-| 3 | 默认查询排除 `is_deleted=True` | [bookmarks/queries.py](bookmarks/queries.py) |
-| 4 | 新增 `query_trashed_bookmarks` | 同上 |
-| 5 | 删除改为软删除 | [bookmarks/views/bookmarks.py](bookmarks/views/bookmarks.py) `remove`、[bookmarks/services/bookmarks.py](bookmarks/services/bookmarks.py) `delete_bookmarks` |
-| 6 | 新增回收站视图、路由 | [bookmarks/urls.py](bookmarks/urls.py)、views |
-| 7 | 新增还原、永久删除接口 | views、services |
-| 8 | BookmarkSearch 增加 `SORT_DELETED_*`、`deleted_since` | [bookmarks/models.py](bookmarks/models.py) |
-| 9 | UserProfile 增加 `trash_search_preferences` | 同上 |
-| 10 | 回收站模板、批量操作 | 模板、handle_action |
-| 11 | API 支持 | [bookmarks/api/](bookmarks/api/) |
-| 12 | 单元测试、E2E 测试 | `bookmarks/tests/` |
-
-**实现要点**：所有 `Bookmark.objects.filter()` 需统一排除 `is_deleted=True`，回收站视图单独查询 `is_deleted=True`。
-
----
-
-### 8. Bundle 二级过滤器与 search_params
-
-**难度**：高 | **依赖**：回收站、日期筛选等（若已迁移）
+**难度**：高 | **依赖**：日期筛选等（若已迁移）
 
 | 步骤 | 操作 | 涉及文件 |
 |------|------|----------|
@@ -156,21 +133,7 @@
 
 ---
 
-### 9. 中文标签聚合（pypinyin）
-
-**难度**：中高 | **依赖**：`pypinyin`
-
-| 步骤 | 操作 | 涉及文件 |
-|------|------|----------|
-| 1 | 添加 `pypinyin` 到 pyproject.toml | [pyproject.toml](pyproject.toml) |
-| 2 | 标签分组逻辑：英文按首字母，中文按拼音首字母 | [bookmarks/views/contexts.py](bookmarks/views/contexts.py) 或 tag cloud 相关 |
-| 3 | 模板渲染分组后的标签 | 标签云模板 |
-
-**实现要点**：`pypinyin.lazy_pinyin` 获取拼音首字母，与英文字母分组逻辑合并。
-
----
-
-### 10. 阅读模式增强（无快照也可阅读）
+### 8. 阅读模式增强（无快照也可阅读）
 
 **难度**：中 | **依赖**：无
 
@@ -182,7 +145,7 @@
 
 ---
 
-### 11. 自定义元数据/快照脚本（drissionpage）
+### 9. 自定义元数据/快照脚本（drissionpage）
 
 **难度**：高 | **依赖**：`drissionpage`（重依赖）
 
@@ -212,16 +175,13 @@ flowchart TD
         B4[界面增强]
     end
     subgraph phase3 [阶段三]
-        C1[回收站]
-        C2[Bundle 二级过滤器]
-        C3[中文标签聚合]
-        C4[阅读模式增强]
+        C1[Bundle 二级过滤器]
+        C2[阅读模式增强]
     end
     A1 --> B1
     A2 --> B1
     B1 --> C1
-    B2 --> C2
-    C1 --> C2
+    B2 --> C1
 ```
 
 **推荐实施顺序**：
@@ -229,9 +189,8 @@ flowchart TD
 1. 随机排序、标签状态筛选（快速见效）
 2. 日期筛选、搜索范围限定
 3. 中文本地化、界面增强
-4. 回收站（核心功能）
-5. Bundle 二级过滤器、中文标签聚合、阅读模式增强
-6. 自定义脚本（可选）
+4. Bundle 二级过滤器、阅读模式增强
+5. 自定义脚本（可选）
 
 ---
 
@@ -241,8 +200,8 @@ flowchart TD
 |------|--------|----------|------|
 | 阶段一 | 2 | 2–4 | 低 |
 | 阶段二 | 4 | 4–8 | 中 |
-| 阶段三 | 4+ | 6–12 | 高 |
-| **合计** | **10+** | **12–24** | - |
+| 阶段三 | 2+ | 4–8 | 高 |
+| **合计** | **8+** | **10–20** | - |
 
 ---
 
