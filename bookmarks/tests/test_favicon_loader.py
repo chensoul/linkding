@@ -190,3 +190,23 @@ class FaviconLoaderTestCase(TestCase):
             favicon_loader.load_favicon("https://example.com")
 
             self.assertTrue(self.icon_exists("https_example_com.ico"))
+
+        self.clear_favicon_folder()
+
+        with mock.patch("requests.get") as mock_get:
+            mock_get.return_value = self.create_mock_response(
+                content_type="image/svg+xml"
+            )
+            favicon_loader.load_favicon("https://example.com")
+
+            self.assertTrue(self.icon_exists("https_example_com.svg"))
+
+        self.clear_favicon_folder()
+
+        with mock.patch("requests.get") as mock_get:
+            mock_get.return_value = self.create_mock_response(
+                content_type="image/svg+xml; charset=utf-8"
+            )
+            favicon_loader.load_favicon("https://example.com")
+
+            self.assertTrue(self.icon_exists("https_example_com.svg"))

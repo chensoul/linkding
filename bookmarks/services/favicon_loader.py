@@ -13,9 +13,9 @@ max_file_age = 60 * 60 * 24  # 1 day
 
 logger = logging.getLogger(__name__)
 
-# register mime type for .ico files, which is not included in the default
-# mimetypes of the Docker image
+# register mime types not included in the default mimetypes of the Docker image
 mimetypes.add_type("image/x-icon", ".ico")
+mimetypes.add_type("image/svg+xml", ".svg")
 
 
 def _ensure_favicon_folder():
@@ -71,8 +71,12 @@ def load_favicon(url: str) -> str:
         favicon_url = settings.LD_FAVICON_PROVIDER.format(**url_parameters)
         logger.debug(f"Loading favicon from: {favicon_url}")
         with requests.get(favicon_url, stream=True) as response:
-            content_type = response.headers["Content-Type"]
+            content_type = response.headers.get("Content-Type", "")
+            # Strip charset etc. (e.g. "image/svg+xml; charset=utf-8" -> "image/svg+xml")
+            content_type = content_type.split(";")[0].strip()
             file_extension = mimetypes.guess_extension(content_type)
+            if not file_extension:
+                file_extension = ".png"  # fallback
             favicon_file = f"{favicon_name}{file_extension}"
             favicon_path = _get_favicon_path(favicon_file)
             with open(favicon_path, "wb") as file:

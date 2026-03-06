@@ -98,50 +98,29 @@
 
 ---
 
-### 6. 界面增强（粘性、滚动、折叠记忆）
-
-**难度**：中 | **依赖**：无
-
-| 步骤 | 操作 | 涉及文件 |
-|------|------|----------|
-| 1 | UserProfile 增加 `sticky_header_controls`、`sticky_side_panel` | [bookmarks/models.py](bookmarks/models.py) |
-| 2 | 数据库迁移 | `bookmarks/migrations/` |
-| 3 | 设置页增加选项 | [bookmarks/views/settings.py](bookmarks/views/settings.py)、设置模板 |
-| 4 | CSS 粘性样式 | [bookmarks/styles/](bookmarks/styles/) |
-| 5 | 前端折叠状态记忆（sessionStorage） | [bookmarks/frontend/](bookmarks/frontend/) |
-
-**实现要点**：`position: sticky`、`overflow` 独立滚动、`sessionStorage` 存折叠状态。
-
----
-
 ## 阶段三：高难度功能（预估 6–12 天）
 
 ### 7. Bundle 二级过滤器与 search_params
 
-**难度**：高 | **依赖**：日期筛选等（若已迁移）
+**难度**：高 | **依赖**：日期筛选等（若已迁移） | **状态**：已简化实现
 
-| 步骤 | 操作 | 涉及文件 |
-|------|------|----------|
-| 1 | BookmarkBundle 增加 `show_count`、`is_folder`、`search_params` (JSONField) | [bookmarks/models.py](bookmarks/models.py) |
-| 2 | 与现有 `filter_unread`、`filter_shared` 兼容：迁移或并存 | 需设计：保留现有字段或迁移到 search_params |
-| 3 | 实现 `bundle.search_object` 返回 BookmarkSearch | 同上 |
-| 4 | 修改 `_filter_bundle` 使用 search_params | [bookmarks/queries.py](bookmarks/queries.py) |
-| 5 | Bundle 表单、模板支持二级结构与 search_params 编辑 | [bookmarks/views/bundles.py](bookmarks/views/bundles.py)、模板 |
-| 6 | 单元测试 | `bookmarks/tests/` |
-
-**实现要点**：linkding-cn 用 `search_params` 替代了 `filter_unread`/`filter_shared`，当前项目 #1308 已加这两字段，需统一设计避免重复。
+| 步骤 | 操作 | 涉及文件 | 状态 |
+|------|------|----------|------|
+| 1 | BookmarkBundle 增加 `search_params` (JSONField) | [bookmarks/models.py](bookmarks/models.py) | ✅ 已实现 |
+| 2 | 与现有 `filter_unread`、`filter_shared` 兼容 | 保留现有字段，search_params 通过 `get_search_overrides` 合并 | ✅ 已实现 |
+| 3 | search_params 支持 `tagged`、`date_filter` | [bookmarks/models.py](bookmarks/models.py)、[bookmarks/queries.py](bookmarks/queries.py) | ✅ 已实现 |
+| 4 | Bundle 表单：标签状态、日期筛选（相对时间） | [bookmarks/forms.py](bookmarks/forms.py)、[bookmarks/templates/bundles/form.html](bookmarks/templates/bundles/form.html) | ✅ 已实现 |
+| 5 | URL 预填支持 `!last_7_days` 等日期关键词 | [bookmarks/queries.py](bookmarks/queries.py)、[bookmarks/views/bundles.py](bookmarks/views/bundles.py) | ✅ 已实现 |
+| 6 | `show_count`、`is_folder` | - | ⏸ 暂不实现 |
+| 7 | 排序、必需标签、排除标签、绝对日期 | - | ⏸ 暂不实现 |
 
 ---
 
 ### 8. 阅读模式增强（无快照也可阅读）
 
-**难度**：中 | **依赖**：无
+**难度**：中 | **依赖**：无 | **状态**：已移除
 
-| 步骤 | 操作 | 涉及文件 |
-|------|------|----------|
-| 1 | 阅读模式入口不依赖 `latest_snapshot` | [bookmarks/views/bookmarks.py](bookmarks/views/bookmarks.py) 或 assets |
-| 2 | 无快照时用 Readability 或 iframe 加载原 URL | [bookmarks/views/assets.py](bookmarks/views/assets.py) 或新建 view |
-| 3 | 模板/前端允许无快照书签进入阅读模式 | 书签详情、阅读模式入口 |
+阅读模式功能已移除。
 
 ---
 
@@ -157,6 +136,19 @@
 | 4 | 安全：脚本沙箱或白名单路径 | - |
 
 **建议**：可延后或作为可选功能，优先完成其他迁移。
+
+---
+
+## 暂不实现
+
+以下功能在迁移过程中已简化或暂不纳入实现范围：
+
+| 功能 | 说明 |
+|------|------|
+| 界面增强（粘性、滚动、折叠记忆） | 搜索面板的粘性定位、滚动状态、折叠状态记忆（阶段二 B4） |
+| 标签中文拼音（pypinyin） | 中文标签按拼音分组/排序，依赖 pypinyin 库 |
+| favicon 快速筛选 | 按 favicon 筛选书签的界面功能 |
+| 回收站 | 软删除、还原、永久删除、批量操作，需新增 is_deleted 等字段 |
 
 ---
 

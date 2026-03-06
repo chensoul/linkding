@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-06 08:01+0000\n"
+"POT-Creation-Date: 2026-03-06 09:03+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -78,7 +78,7 @@ msgid ""
 msgstr "无效的令牌头，令牌字符串不应包含无效字符。"
 
 #: bookmarks/forms.py:218 bookmarks/forms.py:223 bookmarks/forms.py:257
-#: bookmarks/forms.py:262
+#: bookmarks/forms.py:262 bookmarks/templates/bookmarks/bulk_edit_bar.html:40
 msgid "All"
 msgstr "全部"
 
@@ -128,7 +128,7 @@ msgstr "最近 30 天"
 
 #: bookmarks/forms.py:258 bookmarks/forms.py:361
 #: bookmarks/templates/bookmarks/bookmark_list.html:127
-#: bookmarks/templates/bookmarks/details/form.html:73
+#: bookmarks/templates/bookmarks/details/form.html:61
 #: bookmarks/templates/shared/nav_menu.html:23
 #: bookmarks/templates/shared/nav_menu.html:87
 msgid "Unread"
@@ -140,7 +140,7 @@ msgstr "已读"
 
 #: bookmarks/forms.py:263 bookmarks/forms.py:356
 #: bookmarks/templates/bookmarks/bookmark_list.html:140
-#: bookmarks/templates/bookmarks/details/form.html:83
+#: bookmarks/templates/bookmarks/details/form.html:71
 #: bookmarks/templates/shared/nav_menu.html:18
 msgid "Shared"
 msgstr "已分享"
@@ -183,13 +183,85 @@ msgstr "有标签"
 msgid "Untagged"
 msgstr "无标签"
 
-#: bookmarks/forms.py:375
+#: bookmarks/forms.py:375 bookmarks/models.py:513
 msgid "Absolute"
 msgstr "绝对"
 
-#: bookmarks/forms.py:376
+#: bookmarks/forms.py:376 bookmarks/models.py:512
 msgid "Relative"
 msgstr "相对"
+
+#: bookmarks/forms.py:429
+msgid "Everyone"
+msgstr "全部"
+
+#: bookmarks/forms.py:527
+msgid "Standard profile"
+msgstr "标准配置"
+
+#: bookmarks/models.py:504
+msgid "Auto"
+msgstr "自动"
+
+#: bookmarks/models.py:505
+msgid "Light"
+msgstr "浅色"
+
+#: bookmarks/models.py:506
+msgid "Dark"
+msgstr "深色"
+
+#: bookmarks/models.py:514
+msgid "Hidden"
+msgstr "隐藏"
+
+#: bookmarks/models.py:519
+msgid "Inline"
+msgstr "内联"
+
+#: bookmarks/models.py:520
+msgid "Separate"
+msgstr "独立"
+
+#: bookmarks/models.py:525
+msgid "New page"
+msgstr "新窗口"
+
+#: bookmarks/models.py:526
+msgid "Same page"
+msgstr "当前页"
+
+#: bookmarks/models.py:531 bookmarks/models.py:544
+msgid "Disabled"
+msgstr "禁用"
+
+#: bookmarks/models.py:532
+msgid "Enabled"
+msgstr "启用"
+
+#: bookmarks/models.py:537
+msgid "Strict"
+msgstr "严格"
+
+#: bookmarks/models.py:538
+msgid "Lax"
+msgstr "宽松"
+
+#: bookmarks/models.py:543
+msgid "Alphabetical"
+msgstr "按字母"
+
+#: bookmarks/models.py:696 bookmarks/templates/registration/login.html:9
+#: bookmarks/templates/registration/login.html:25
+#: bookmarks/templates/shared/layout.html:42
+msgid "Login"
+msgstr "登录"
+
+#: bookmarks/models.py:697
+#, fuzzy
+#| msgid "Shared bookmarks"
+msgid "Shared Bookmarks"
+msgstr "已分享书签"
 
 #: bookmarks/templates/bookmarks/bookmark_list.html:5
 #, fuzzy
@@ -243,7 +315,7 @@ msgid "Unshare?"
 msgstr "取消分享？"
 
 #: bookmarks/templates/bookmarks/bookmark_list.html:148
-#: bookmarks/templates/bookmarks/details/form.html:118
+#: bookmarks/templates/bookmarks/details/form.html:106
 #: bookmarks/templates/bookmarks/form.html:51
 #: bookmarks/templates/bookmarks/form.html:53
 msgid "Notes"
@@ -308,9 +380,11 @@ msgid "Execute"
 msgstr "执行"
 
 #: bookmarks/templates/bookmarks/bulk_edit_bar.html:40
-#, python-format
-msgid "All %(total)s bookmarks"
-msgstr "全部 %(total)s 个书签"
+#, fuzzy
+#| msgid "Bookmarks"
+msgid "bookmark"
+msgid_plural "bookmarks"
+msgstr[0] "书签"
 
 #: bookmarks/templates/bookmarks/bundle_section.html:5
 #: bookmarks/templates/bundles/index.html:9
@@ -347,28 +421,24 @@ msgstr "（失败）"
 msgid "Upload file"
 msgstr "上传"
 
-#: bookmarks/templates/bookmarks/details/form.html:30
-msgid "Reader mode"
-msgstr "阅读模式"
-
-#: bookmarks/templates/bookmarks/details/form.html:44
+#: bookmarks/templates/bookmarks/details/form.html:32
 msgid "Internet Archive"
 msgstr "互联网档案馆"
 
-#: bookmarks/templates/bookmarks/details/form.html:56
+#: bookmarks/templates/bookmarks/details/form.html:44
 msgid "Status"
 msgstr "状态"
 
-#: bookmarks/templates/bookmarks/details/form.html:64
+#: bookmarks/templates/bookmarks/details/form.html:52
 #: bookmarks/templates/shared/nav_menu.html:14
 msgid "Archived"
 msgstr "已归档"
 
-#: bookmarks/templates/bookmarks/details/form.html:91
+#: bookmarks/templates/bookmarks/details/form.html:79
 msgid "Files"
 msgstr "文件"
 
-#: bookmarks/templates/bookmarks/details/form.html:96
+#: bookmarks/templates/bookmarks/details/form.html:84
 #: bookmarks/templates/bookmarks/form.html:18
 #: bookmarks/templates/bookmarks/tag_section.html:4
 #: bookmarks/templates/bundles/form.html:23
@@ -376,11 +446,11 @@ msgstr "文件"
 msgid "Tags"
 msgstr "标签"
 
-#: bookmarks/templates/bookmarks/details/form.html:105
+#: bookmarks/templates/bookmarks/details/form.html:93
 msgid "Date added"
 msgstr "添加日期"
 
-#: bookmarks/templates/bookmarks/details/form.html:112
+#: bookmarks/templates/bookmarks/details/form.html:100
 #: bookmarks/templates/bookmarks/form.html:41
 msgid "Description"
 msgstr "描述"
@@ -483,6 +553,7 @@ msgstr "保存"
 #: bookmarks/templates/bookmarks/form.html:89
 #: bookmarks/templates/bundles/form.html:60
 #: bookmarks/templates/settings/create_api_token_modal.html:27
+#: bookmarks/templates/shared/layout.html:7
 #: bookmarks/templates/tags/edit.html:17 bookmarks/templates/tags/merge.html:47
 #: bookmarks/templates/tags/new.html:17
 msgid "Cancel"
@@ -668,12 +739,6 @@ msgstr[0] "找到 %(counter)s 个匹配此分组的书签。"
 #: bookmarks/templates/registration/login.html:4
 msgid "Login - Linkding"
 msgstr "登录 - Linkding"
-
-#: bookmarks/templates/registration/login.html:9
-#: bookmarks/templates/registration/login.html:25
-#: bookmarks/templates/shared/layout.html:38
-msgid "Login"
-msgstr "登录"
 
 #: bookmarks/templates/registration/login.html:15
 msgid "Your username and password didn't match. Please try again."
@@ -1402,6 +1467,14 @@ msgstr ""
 msgid "Self-hosted bookmark service"
 msgstr "自托管书签服务"
 
+#: bookmarks/templates/shared/layout.html:6
+msgid "Are you sure?"
+msgstr "确定吗？"
+
+#: bookmarks/templates/shared/layout.html:8
+msgid "Confirm"
+msgstr "确认"
+
 #: bookmarks/templates/shared/modal_header.html:6
 msgid "Close dialog"
 msgstr "关闭对话框"
@@ -1645,6 +1718,14 @@ msgstr "分组 '%(name)s' 已成功删除。"
 msgid "Bundle saved successfully."
 msgstr "分组保存成功。"
 
+#: bookmarks/views/contexts.py:156
+msgid "View latest snapshot"
+msgstr "查看最新快照"
+
+#: bookmarks/views/contexts.py:160
+msgid "View snapshot on the Internet Archive Wayback Machine"
+msgstr "在互联网档案馆查看快照"
+
 #: bookmarks/views/settings.py:77
 msgid "Global settings updated"
 msgstr "全局设置已更新"
@@ -1709,3 +1790,10 @@ msgstr "标签 \"%(name)s\" 创建成功。"
 #, python-format
 msgid "Successfully merged %(count)s tags (%(tag_names)s) into \"%(target)s\"."
 msgstr "已成功将 %(count)s 个标签（%(tag_names)s）合并到 \"%(target)s\"。"
+
+#, python-format
+#~ msgid "All %(total)s bookmarks"
+#~ msgstr "全部 %(total)s 个书签"
+
+#~ msgid "Reader mode"
+#~ msgstr "阅读模式"

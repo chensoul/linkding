@@ -37,7 +37,7 @@
   <label class="form-checkbox select-across d-none">
     <input type="checkbox" name="bulk_select_across">
     <i class="form-icon"></i>
-    {% blocktrans with total=bookmark_list.bookmarks_total %}All {{ total }} bookmarks{% endblocktrans %}
+    {% trans "All" %} <span class="total">{{ bookmark_list.bookmarks_total }}</span> {% blocktrans count counter=bookmark_list.bookmarks_total %}bookmark{% plural %}bookmarks{% endblocktrans %}
   </label>
 </div>
 {% endhtmlmin %}

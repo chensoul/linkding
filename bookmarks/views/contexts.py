@@ -3,7 +3,7 @@ import urllib.parse
 
 from django.conf import settings
 from django.core.paginator import Paginator
-from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext, gettext_lazy
 from django.db import models
 from django.http import Http404
 from django.urls import reverse
@@ -153,10 +153,10 @@ class BookmarkItem:
             self.snapshot_url = reverse(
                 "linkding:assets.view", args=[bookmark.latest_snapshot_id]
             )
-            self.snapshot_title = "View latest snapshot"
+            self.snapshot_title = gettext("View latest snapshot")
         else:
             self.snapshot_url = bookmark.web_archive_snapshot_url
-            self.snapshot_title = (
+            self.snapshot_title = gettext(
                 "View snapshot on the Internet Archive Wayback Machine"
             )
             if not self.snapshot_url:

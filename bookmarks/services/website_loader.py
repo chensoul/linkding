@@ -40,6 +40,42 @@ def _load_website_metadata_cached(url: str):
     return _load_website_metadata(url)
 
 
+def _extract_title(soup: BeautifulSoup) -> str | None:
+    """
+    Extract page title with fallbacks for various page types.
+    Order: <title> -> og:title -> twitter:title -> itemprop="name"
+    Handles WeChat articles and other sites that omit <title> but use Open Graph.
+    """
+    # 1. Standard <title> tag
+    if soup.title and soup.title.string:
+        t = soup.title.string.strip()
+        if t:
+            return t
+
+    # 2. Open Graph (og:title) - used by WeChat, Facebook, many sites
+    tag = soup.find("meta", attrs={"property": "og:title"})
+    if tag and tag.get("content"):
+        t = tag["content"].strip()
+        if t:
+            return t
+
+    # 3. Twitter Card
+    tag = soup.find("meta", attrs={"name": "twitter:title"})
+    if tag and tag.get("content"):
+        t = tag["content"].strip()
+        if t:
+            return t
+
+    # 4. Schema.org itemprop
+    tag = soup.find("meta", attrs={"itemprop": "name"})
+    if tag and tag.get("content"):
+        t = tag["content"].strip()
+        if t:
+            return t
+
+    return None
+
+
 def _load_website_metadata(url: str):
     title = None
     description = None
@@ -53,8 +89,7 @@ def _load_website_metadata(url: str):
         start = timezone.now()
         soup = BeautifulSoup(page_text, "html.parser")
 
-        if soup.title and soup.title.string:
-            title = soup.title.string.strip()
+        title = _extract_title(soup)
         description_tag = soup.find("meta", attrs={"name": "description"})
         description = (
             description_tag["content"].strip()

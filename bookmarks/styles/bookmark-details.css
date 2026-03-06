@@ -13,8 +13,10 @@
 
   & .weblinks {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     gap: var(--unit-2);
+    align-items: center;
   }
 
   & a.weblink {
@@ -96,5 +98,15 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: nowrap;
+    gap: var(--unit-2);
+
+    & .left-actions,
+    & .right-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--unit-2);
+      flex-shrink: 0;
+    }
   }
 }

@@ -31,8 +31,16 @@ class WebsiteLoaderTestCase(TestCase):
         website_loader._load_website_metadata_cached.cache_clear()
 
     def render_html_document(
-        self, title, description="", og_description="", og_image=""
+        self,
+        title="",
+        description="",
+        og_description="",
+        og_image="",
+        og_title="",
+        twitter_title="",
+        itemprop_name="",
     ):
+        meta_title = f"<title>{title}</title>" if title else ""
         meta_description = (
             f'<meta name="description" content="{description}">' if description else ""
         )
@@ -44,15 +52,31 @@ class WebsiteLoaderTestCase(TestCase):
         meta_og_image = (
             f'<meta property="og:image" content="{og_image}">' if og_image else ""
         )
+        meta_og_title = (
+            f'<meta property="og:title" content="{og_title}">' if og_title else ""
+        )
+        meta_twitter_title = (
+            f'<meta name="twitter:title" content="{twitter_title}">'
+            if twitter_title
+            else ""
+        )
+        meta_itemprop = (
+            f'<meta itemprop="name" content="{itemprop_name}">'
+            if itemprop_name
+            else ""
+        )
         return f"""
         <!DOCTYPE html>
         <html lang="en">
         <head>
             <meta charset="UTF-8">
-            <title>{title}</title>
+            {meta_title}
             {meta_description}
             {meta_og_description}
             {meta_og_image}
+            {meta_og_title}
+            {meta_twitter_title}
+            {meta_itemprop}
         </head>
         <body></body>
         </html>
@@ -184,6 +208,47 @@ class WebsiteLoaderTestCase(TestCase):
             metadata = website_loader.load_website_metadata("https://example.com")
             self.assertEqual("test title", metadata.title)
             self.assertEqual("test description", metadata.description)
+
+    def test_load_website_metadata_uses_og_title_when_title_empty(self):
+        """WeChat articles and similar may omit <title> but have og:title."""
+        with mock.patch(
+            "bookmarks.services.website_loader.load_page"
+        ) as mock_load_page:
+            mock_load_page.return_value = self.render_html_document(
+                og_title="微信公众号文章标题"
+            )
+            metadata = website_loader.load_website_metadata("https://example.com")
+            self.assertEqual("微信公众号文章标题", metadata.title)
+
+    def test_load_website_metadata_uses_twitter_title_as_fallback(self):
+        with mock.patch(
+            "bookmarks.services.website_loader.load_page"
+        ) as mock_load_page:
+            mock_load_page.return_value = self.render_html_document(
+                twitter_title="Twitter Card Title"
+            )
+            metadata = website_loader.load_website_metadata("https://example.com")
+            self.assertEqual("Twitter Card Title", metadata.title)
+
+    def test_load_website_metadata_uses_itemprop_as_last_fallback(self):
+        with mock.patch(
+            "bookmarks.services.website_loader.load_page"
+        ) as mock_load_page:
+            mock_load_page.return_value = self.render_html_document(
+                itemprop_name="Schema.org Name"
+            )
+            metadata = website_loader.load_website_metadata("https://example.com")
+            self.assertEqual("Schema.org Name", metadata.title)
+
+    def test_load_website_metadata_prefers_title_over_og_title(self):
+        with mock.patch(
+            "bookmarks.services.website_loader.load_page"
+        ) as mock_load_page:
+            mock_load_page.return_value = self.render_html_document(
+                title="Page Title", og_title="OG Title"
+            )
+            metadata = website_loader.load_website_metadata("https://example.com")
+            self.assertEqual("Page Title", metadata.title)
 
     def test_website_metadata_ignore_cache(self):
         expected_html = '<html><head><title>Test Title</title><meta name="description" content="Test Description"><meta property="og:image" content="/images/test.jpg"></head></html>'

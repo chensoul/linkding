@@ -1,7 +1,11 @@
 {% load static i18n %}
 <!DOCTYPE html>
 {# Use data attributes as storage for access in static scripts #}
-<html lang="{{ request.LANGUAGE_CODE|default:'en' }}" data-api-base-url="{% url 'linkding:api-root' %}">
+<html lang="{{ request.LANGUAGE_CODE|default:'en' }}"
+      data-api-base-url="{% url 'linkding:api-root' %}"
+      data-confirm-question="{% trans 'Are you sure?' %}"
+      data-confirm-cancel="{% trans 'Cancel' %}"
+      data-confirm-ok="{% trans 'Confirm' %}">
   {% block head %}
     {% include 'shared/head.html' %}
   {% endblock %}

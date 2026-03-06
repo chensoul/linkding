@@ -180,48 +180,6 @@ class BookmarkDetailsModalTestCase(TestCase, BookmarkFactoryMixin, HtmlTestMixin
         self.assertIsNotNone(image)
         self.assertEqual(image["src"], "/static/example.png")
 
-    def test_reader_mode_link(self):
-        # no latest snapshot
-        bookmark = self.setup_bookmark()
-        soup = self.get_index_details_modal(bookmark)
-        self.assertEqual(self.count_weblinks(soup), 2)
-
-        # snapshot is not complete
-        self.setup_asset(
-            bookmark,
-            asset_type=BookmarkAsset.TYPE_SNAPSHOT,
-            status=BookmarkAsset.STATUS_PENDING,
-        )
-        self.setup_asset(
-            bookmark,
-            asset_type=BookmarkAsset.TYPE_SNAPSHOT,
-            status=BookmarkAsset.STATUS_FAILURE,
-        )
-        soup = self.get_index_details_modal(bookmark)
-        self.assertEqual(self.count_weblinks(soup), 2)
-
-        # not a snapshot
-        self.setup_asset(
-            bookmark,
-            asset_type="upload",
-            status=BookmarkAsset.STATUS_COMPLETE,
-        )
-        soup = self.get_index_details_modal(bookmark)
-        self.assertEqual(self.count_weblinks(soup), 2)
-
-        # snapshot is complete
-        asset = self.setup_asset(
-            bookmark,
-            asset_type=BookmarkAsset.TYPE_SNAPSHOT,
-            status=BookmarkAsset.STATUS_COMPLETE,
-        )
-        soup = self.get_index_details_modal(bookmark)
-        self.assertEqual(self.count_weblinks(soup), 3)
-
-        reader_mode_url = reverse("linkding:assets.read", args=[asset.id])
-        link = self.find_weblink(soup, reader_mode_url)
-        self.assertIsNotNone(link)
-
     def test_internet_archive_link_with_snapshot_url(self):
         bookmark = self.setup_bookmark(web_archive_snapshot_url="https://example.com/")
         soup = self.get_index_details_modal(bookmark)

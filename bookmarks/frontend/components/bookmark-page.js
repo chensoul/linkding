@@ -103,8 +103,10 @@ class BookmarkPage extends HeadlessElement {
     // Update total number of bookmarks
     const totalHolder = this.querySelector("[data-bookmarks-total]");
     const total = totalHolder?.dataset.bookmarksTotal || 0;
-    const totalSpan = this.selectAcross.querySelector("span.total");
-    totalSpan.textContent = total;
+    const totalSpan = this.selectAcross?.querySelector("span.total");
+    if (totalSpan) {
+      totalSpan.textContent = total;
+    }
   }
 
   onToggleBulkEdit() {

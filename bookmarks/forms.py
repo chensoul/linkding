@@ -426,7 +426,7 @@ class BookmarkSearchForm(forms.Form):
         # set choices for user field if users are provided
         if users:
             user_choices = [(user.username, user.username) for user in users]
-            user_choices.insert(0, ("", "Everyone"))
+            user_choices.insert(0, ("", _("Everyone")))
             self.fields["user"].choices = user_choices
 
         for param in search.params:
@@ -524,4 +524,4 @@ class GlobalSettingsForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["guest_profile_user"].empty_label = "Standard profile"
+        self.fields["guest_profile_user"].empty_label = _("Standard profile")

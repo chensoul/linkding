@@ -67,7 +67,14 @@ class ConfirmDropdown extends LitElement {
   }
 
   render() {
-    const questionText = this.button.dataset.confirmQuestion || "Are you sure?";
+    const questionText =
+      this.button.dataset.confirmQuestion ||
+      document.documentElement.dataset.confirmQuestion ||
+      "Are you sure?";
+    const cancelLabel =
+      document.documentElement.dataset.confirmCancel || "Cancel";
+    const confirmLabel =
+      document.documentElement.dataset.confirmOk || "Confirm";
     return html`
       <div
         class="menu with-arrow"
@@ -78,9 +85,9 @@ class ConfirmDropdown extends LitElement {
         <span id=${this.confirmId} style="font-weight: bold;">
           ${questionText}
         </span>
-        <button type="button" class="btn" @click=${this.close}>Cancel</button>
+        <button type="button" class="btn" @click=${this.close}>${cancelLabel}</button>
         <button type="submit" class="btn btn-error" @click=${this.confirm}>
-          Confirm
+          ${confirmLabel}
         </button>
         <div class="menu-arrow"></div>
       </div>

@@ -18,18 +18,6 @@
         {% endif %}
         <span>{{ details.bookmark.url }}</span>
       </a>
-      {% if details.latest_snapshot %}
-        <a class="weblink"
-           href="{% url 'linkding:assets.read' details.latest_snapshot.id %}"
-           target="{{ details.profile.bookmark_link_target }}">
-          {% if details.show_link_icons %}
-            <svg class="favicon">
-              <use href="{% static 'icons.svg' %}?v={{ app_version }}#unread"></use>
-            </svg>
-          {% endif %}
-          <span>{% trans "Reader mode" %}</span>
-        </a>
-      {% endif %}
       {% if details.web_archive_snapshot_url %}
         <a class="weblink"
            href="{{ details.web_archive_snapshot_url }}"
