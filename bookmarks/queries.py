@@ -59,6 +59,19 @@ def query_shared_bookmarks(
 
 def _convert_ast_to_q_object(ast_node: SearchExpression, profile: UserProfile) -> Q:
     if isinstance(ast_node, TermExpression):
+        # When scope is set, search only in that field; otherwise search all fields
+        if ast_node.scope:
+            scope_field_map = {
+                "title": "title",
+                "description": "description",
+                "notes": "notes",
+                "url": "url",
+            }
+            field = scope_field_map.get(ast_node.scope)
+            if field:
+                return Q(**{f"{field}__icontains": ast_node.term})
+            return Q()
+
         # Search across title, description, notes, URL
         conditions = (
             Q(title__icontains=ast_node.term)

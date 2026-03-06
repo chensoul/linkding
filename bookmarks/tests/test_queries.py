@@ -344,6 +344,141 @@ class QueriesBasicTestCase(TestCase, BookmarkFactoryMixin):
         )
         self.assertQueryResult(query, [])
 
+    def test_query_bookmarks_scope_in_title(self):
+        """in:title limits search to title field only."""
+        if self.profile.legacy_search:
+            self.skipTest("Search scope is not supported in legacy search mode")
+        title_only = self.setup_bookmark(
+            title="scopetest title match",
+            description="",
+            notes="",
+            url="http://example.com/other",
+        )
+        desc_only = self.setup_bookmark(
+            title="other",
+            description="scopetest description match",
+            notes="",
+            url="http://example.com/other",
+        )
+
+        query = queries.query_bookmarks(
+            self.user, self.profile, BookmarkSearch(q="in:title scopetest")
+        )
+        self.assertCountEqual(list(query), [title_only])
+
+    def test_query_bookmarks_scope_in_description(self):
+        """in:description limits search to description field only."""
+        if self.profile.legacy_search:
+            self.skipTest("Search scope is not supported in legacy search mode")
+        title_only = self.setup_bookmark(
+            title="scopetest title match",
+            description="",
+            notes="",
+            url="http://example.com/other",
+        )
+        desc_only = self.setup_bookmark(
+            title="other",
+            description="scopetest description match",
+            notes="",
+            url="http://example.com/other",
+        )
+
+        query = queries.query_bookmarks(
+            self.user, self.profile, BookmarkSearch(q="in:description scopetest")
+        )
+        self.assertCountEqual(list(query), [desc_only])
+
+    def test_query_bookmarks_scope_in_notes(self):
+        """in:notes limits search to notes field only."""
+        if self.profile.legacy_search:
+            self.skipTest("Search scope is not supported in legacy search mode")
+        notes_only = self.setup_bookmark(
+            title="other",
+            description="",
+            notes="scopetest notes match",
+            url="http://example.com/other",
+        )
+        title_only = self.setup_bookmark(
+            title="scopetest title match",
+            description="",
+            notes="",
+            url="http://example.com/other",
+        )
+
+        query = queries.query_bookmarks(
+            self.user, self.profile, BookmarkSearch(q="in:notes scopetest")
+        )
+        self.assertCountEqual(list(query), [notes_only])
+
+    def test_query_bookmarks_scope_in_url(self):
+        """in:url limits search to url field only."""
+        if self.profile.legacy_search:
+            self.skipTest("Search scope is not supported in legacy search mode")
+        url_only = self.setup_bookmark(
+            title="other",
+            description="",
+            notes="",
+            url="http://example.com/scopetest/url",
+        )
+        title_only = self.setup_bookmark(
+            title="scopetest title match",
+            description="",
+            notes="",
+            url="http://example.com/other",
+        )
+
+        query = queries.query_bookmarks(
+            self.user, self.profile, BookmarkSearch(q="in:url scopetest")
+        )
+        self.assertCountEqual(list(query), [url_only])
+
+    def test_query_bookmarks_scope_in_title_syntax_after_term(self):
+        """foo in:title syntax - scope after term."""
+        if self.profile.legacy_search:
+            self.skipTest("Search scope is not supported in legacy search mode")
+        title_only = self.setup_bookmark(
+            title="scopetest title match",
+            description="",
+            notes="",
+            url="http://example.com/other",
+        )
+        desc_only = self.setup_bookmark(
+            title="other",
+            description="scopetest description match",
+            notes="",
+            url="http://example.com/other",
+        )
+
+        query = queries.query_bookmarks(
+            self.user, self.profile, BookmarkSearch(q="scopetest in:title")
+        )
+        self.assertCountEqual(list(query), [title_only])
+
+    def test_query_bookmarks_scope_combined_with_other_terms(self):
+        """Scope can be combined with unscoped terms."""
+        if self.profile.legacy_search:
+            self.skipTest("Search scope is not supported in legacy search mode")
+        # Bookmark with scopetest in title AND scopebar in description
+        bm = self.setup_bookmark(
+            title="scopetest in title",
+            description="scopebar in description",
+            notes="",
+            url="http://example.com/other",
+        )
+        # Bookmark with scopetest in description (should not match in:title scopetest scopebar)
+        self.setup_bookmark(
+            title="other",
+            description="scopetest scopebar",
+            notes="",
+            url="http://example.com/other",
+        )
+
+        query = queries.query_bookmarks(
+            self.user, self.profile, BookmarkSearch(q="in:title scopetest scopebar")
+        )
+        # scopetest must be in title, scopebar in any field - only first bookmark matches
+        self.assertCountEqual(list(query), [bm])
+
     def test_query_bookmarks_should_not_return_archived_bookmarks(self):
         bookmark1 = self.setup_bookmark()
         bookmark2 = self.setup_bookmark()

@@ -13,6 +13,7 @@ Every search query is made up of one or more expressions. An expression can be a
 | Word         | `history`                          | Search for a single word in title, description, notes, URL |
 | Phrase       | `"history of rome"`                | Search for an exact phrase by enclosing it in quotes       |
 | Tag          | `#book`                            | Search for a tag                                           |
+| Search scope | `in:title foo` or `foo in:title`   | Limit search to a specific field (title, description, notes, url) |
 | AND operator | `#history and #book`               | Both expressions must match                                |
 | OR operator  | `#book or #article`                | Either expression must match                               |
 | NOT operator | `not #article`                     | Expression must not match                                  |
@@ -29,6 +30,7 @@ history and rome and #book
 
 Some additional rules to keep in mind:
 - Words, phrases, tags, and operators are all case-insensitive.
+- Use `in:title`, `in:description`, `in:notes`, or `in:url` to limit search to a specific field. For example, `in:title tutorial` or `tutorial in:url` searches only in that field.
 - Tags must be prefixed with a `#` symbol. If the *lax* tag search mode is enabled in the settings, the `#` prefix is optional. In that case searching for a word will return both bookmarks containing that word or bookmarks tagged with that word.
 - An operator (`and`, `or`, `not`) can not be used as a search term as such. To explicitly search for these words, use a phrase: `"beyond good and evil"`, `"good or bad"`, `"not found"`.
 
@@ -65,6 +67,16 @@ Search bookmarks that contain both "history" and "rome", but are not tagged with
 history rome not (#article or #book)
 ```
 Search bookmarks that contain both "history" and "rome", but are not tagged with either "article" or "book".
+
+```
+in:title tutorial
+```
+Search bookmarks whose title contains "tutorial".
+
+```
+in:url example.com
+```
+Search bookmarks whose URL contains "example.com".
 
 ## Legacy Search
 

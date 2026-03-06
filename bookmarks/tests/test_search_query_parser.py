@@ -19,8 +19,8 @@ from bookmarks.services.search_query_parser import (
 )
 
 
-def _term(term: str) -> TermExpression:
-    return TermExpression(term)
+def _term(term: str, scope: str | None = None) -> TermExpression:
+    return TermExpression(term, scope=scope)
 
 
 def _tag(tag: str) -> TagExpression:
@@ -341,6 +341,48 @@ class SearchQueryTokenizerTest(TestCase):
         self.assertEqual(len(tokens), 1)
         self.assertEqual(tokens[0].type, TokenType.EOF)
 
+    def test_scope_tokens(self):
+        # in:title, in:description, in:notes, in:url are recognized as SCOPE
+        for scope in ["title", "description", "notes", "url"]:
+            tokenizer = SearchQueryTokenizer(f"in:{scope}")
+            tokens = tokenizer.tokenize()
+            self.assertEqual(len(tokens), 2, f"Failed for in:{scope}")
+            self.assertEqual(tokens[0].type, TokenType.SCOPE)
+            self.assertEqual(tokens[0].value, scope)
+            self.assertEqual(tokens[1].type, TokenType.EOF)
+
+        # Case insensitive
+        tokenizer = SearchQueryTokenizer("in:TITLE")
+        tokens = tokenizer.tokenize()
+        self.assertEqual(tokens[0].type, TokenType.SCOPE)
+        self.assertEqual(tokens[0].value, "title")
+
+    def test_scope_with_term(self):
+        tokenizer = SearchQueryTokenizer("in:title foo")
+        tokens = tokenizer.tokenize()
+        self.assertEqual(len(tokens), 3)
+        self.assertEqual(tokens[0].type, TokenType.SCOPE)
+        self.assertEqual(tokens[0].value, "title")
+        self.assertEqual(tokens[1].type, TokenType.TERM)
+        self.assertEqual(tokens[1].value, "foo")
+        self.assertEqual(tokens[2].type, TokenType.EOF)
+
+        tokenizer = SearchQueryTokenizer("foo in:title")
+        tokens = tokenizer.tokenize()
+        self.assertEqual(len(tokens), 3)
+        self.assertEqual(tokens[0].type, TokenType.TERM)
+        self.assertEqual(tokens[0].value, "foo")
+        self.assertEqual(tokens[1].type, TokenType.SCOPE)
+        self.assertEqual(tokens[1].value, "title")
+        self.assertEqual(tokens[2].type, TokenType.EOF)
+
+    def test_in_as_term_when_not_valid_scope(self):
+        # in:other is not a valid scope, treated as term
+        tokenizer = SearchQueryTokenizer("in:other")
+        tokens = tokenizer.tokenize()
+        self.assertEqual(tokens[0].type, TokenType.TERM)
+        self.assertEqual(tokens[0].value, "in:other")
+
 
 class SearchQueryParserTest(TestCase):
     """Test cases for the search query parser."""
@@ -625,6 +667,42 @@ class SearchQueryParserTest(TestCase):
         expected = _term("!unread and !untagged")
         self.assertEqual(result, expected)
 
+    def test_scope_in_title_syntax(self):
+        # "in:title foo" - scope before term
+        result = parse_search_query("in:title foo")
+        expected = _term("foo", scope="title")
+        self.assertEqual(result, expected)
+
+        # "foo in:title" - scope after term
+        result = parse_search_query("foo in:title")
+        expected = _term("foo", scope="title")
+        self.assertEqual(result, expected)
+
+    def test_scope_all_fields(self):
+        for scope in ["title", "description", "notes", "url"]:
+            result = parse_search_query(f"in:{scope} foo")
+            self.assertEqual(result, _term("foo", scope=scope))
+
+    def test_scope_with_multiple_terms(self):
+        # "in:title foo bar" - scope applies to foo only
+        result = parse_search_query("in:title foo bar")
+        expected = _and(_term("foo", scope="title"), _term("bar"))
+        self.assertEqual(result, expected)
+
+        # "foo bar in:title" - scope applies to bar only
+        result = parse_search_query("foo bar in:title")
+        expected = _and(_term("foo"), _term("bar", scope="title"))
+        self.assertEqual(result, expected)
+
+    def test_scope_with_operators(self):
+        result = parse_search_query("in:title foo and in:url bar")
+        expected = _and(_term("foo", scope="title"), _term("bar", scope="url"))
+        self.assertEqual(result, expected)
+
+    def test_scope_case_insensitive(self):
+        result = parse_search_query("in:TITLE foo")
+        self.assertEqual(result, _term("foo", scope="title"))
+
     def test_implicit_and_basic(self):
         # Basic implicit AND between terms
         result = parse_search_query("programming book")
@@ -868,6 +946,13 @@ class ExpressionToStringTest(TestCase):
         expr = _term('say "hello"')
         self.assertEqual(expression_to_string(expr), '"say \\"hello\\""')
 
+    def test_term_with_scope(self):
+        expr = _term("foo", scope="title")
+        self.assertEqual(expression_to_string(expr), "foo in:title")
+
+        expr = _term("bar", scope="url")
+        self.assertEqual(expression_to_string(expr), "bar in:url")
+
     def test_and_expression_implicit(self):
         expr = _and(_term("python"), _term("tutorial"))
         self.assertEqual(expression_to_string(expr), "python tutorial")
@@ -926,6 +1011,9 @@ class ExpressionToStringTest(TestCase):
             "tutorial and (python or ruby)",
             "(python or ruby) tutorial",
             "tutorial (python or ruby)",
+            "in:title foo",
+            "foo in:title",
+            "in:url bar and in:description baz",
         ]
 
         for query in test_cases:

@@ -8,12 +8,16 @@ class TokenType(Enum):
     TERM = "TERM"
     TAG = "TAG"
     SPECIAL_KEYWORD = "SPECIAL_KEYWORD"
+    SCOPE = "SCOPE"
     AND = "AND"
     OR = "OR"
     NOT = "NOT"
     LPAREN = "LPAREN"
     RPAREN = "RPAREN"
     EOF = "EOF"
+
+# Valid scope values for in:field syntax
+VALID_SCOPES = frozenset({"title", "description", "notes", "url"})
 
 
 @dataclass
@@ -159,7 +163,7 @@ class SearchQueryTokenizer:
                 if keyword:
                     tokens.append(Token(TokenType.SPECIAL_KEYWORD, keyword, start_pos))
             else:
-                # Read a term and check if it's an operator
+                # Read a term and check if it's an operator or scope
                 term = self.read_term()
                 term_lower = term.lower()
 
@@ -169,6 +173,8 @@ class SearchQueryTokenizer:
                     tokens.append(Token(TokenType.OR, term, start_pos))
                 elif term_lower == "not":
                     tokens.append(Token(TokenType.NOT, term, start_pos))
+                elif term_lower.startswith("in:") and term_lower[3:] in VALID_SCOPES:
+                    tokens.append(Token(TokenType.SCOPE, term_lower[3:], start_pos))
                 else:
                     tokens.append(Token(TokenType.TERM, term, start_pos))
 
@@ -183,6 +189,7 @@ class SearchExpression:
 @dataclass
 class TermExpression(SearchExpression):
     term: str
+    scope: str | None = None  # One of: title, description, notes, url. None = all fields
 
 
 @dataclass
@@ -279,6 +286,7 @@ class SearchQueryParser:
             TokenType.TERM,
             TokenType.TAG,
             TokenType.SPECIAL_KEYWORD,
+            TokenType.SCOPE,
             TokenType.LPAREN,
             TokenType.NOT,
         ]:
@@ -302,9 +310,25 @@ class SearchQueryParser:
 
     def parse_primary_expression(self) -> SearchExpression:
         """Parse primary expressions (terms, tags, special keywords, and parenthesized expressions)."""
-        if self.current_token.type == TokenType.TERM:
+        if self.current_token.type == TokenType.SCOPE:
+            # "in:title foo" - scope applies to following term
+            scope = self.current_token.value
+            self.advance()
+            if self.current_token.type == TokenType.TERM:
+                term = self.current_token.value
+                self.advance()
+                return TermExpression(term, scope=scope)
+            else:
+                # Dangling scope - treat as regular term for leniency
+                return TermExpression(f"in:{scope}", scope=None)
+        elif self.current_token.type == TokenType.TERM:
+            # "foo in:title" - check if scope follows
             term = self.current_token.value
             self.advance()
+            if self.current_token.type == TokenType.SCOPE:
+                scope = self.current_token.value
+                self.advance()
+                return TermExpression(term, scope=scope)
             return TermExpression(term)
         elif self.current_token.type == TokenType.TAG:
             tag = self.current_token.value
@@ -356,8 +380,12 @@ def _expression_to_string(expr: SearchExpression, parent_type: type = None) -> s
         if " " in expr.term or any(c in expr.term for c in ["(", ")", '"', "'"]):
             # Escape any quotes in the term
             escaped = expr.term.replace("\\", "\\\\").replace('"', '\\"')
-            return f'"{escaped}"'
-        return expr.term
+            term_str = f'"{escaped}"'
+        else:
+            term_str = expr.term
+        if expr.scope:
+            return f"{term_str} in:{expr.scope}"
+        return term_str
 
     elif isinstance(expr, TagExpression):
         return f"#{expr.tag}"
