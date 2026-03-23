@@ -260,7 +260,9 @@ def _md_link_destination(url: str) -> str:
 
 def build_bookmarks_markdown_export(bookmark_ids: list, user: User) -> tuple[str, int]:
     """
-    Build a Markdown list of bookmarks (title link, tags, description) for clipboard export.
+    Build Markdown for clipboard export: list item ``- [title](url)``, then optional
+    indented blockquote lines ``  > …`` (two spaces before ``>``; one line per description line).
+    Tags omitted; no quote lines when description is empty. Blank line between bookmarks.
     Preserves the order of bookmark_ids. Returns (markdown, count_exported).
     """
     if not bookmark_ids:
@@ -277,9 +279,7 @@ def build_bookmarks_markdown_export(bookmark_ids: list, user: User) -> tuple[str
         if bid not in seen:
             seen.add(bid)
             ordered_ids.append(bid)
-    bookmarks = Bookmark.objects.filter(owner=user, id__in=ordered_ids).prefetch_related(
-        "tags"
-    )
+    bookmarks = Bookmark.objects.filter(owner=user, id__in=ordered_ids)
     by_id = {b.id: b for b in bookmarks}
     chunks: list[str] = []
     count = 0
@@ -291,20 +291,11 @@ def build_bookmarks_markdown_export(bookmark_ids: list, user: User) -> tuple[str
         title = _md_escape_link_title(bm.resolved_title)
         url_part = _md_link_destination(bm.url or "")
         chunks.append(f"- [{title}]({url_part})")
-        tag_names = sorted(t.name for t in bm.tags.all())
-        tag_line = " ".join(f"#{n}" for n in tag_names) if tag_names else "—"
-        chunks.append(f"  - 标签：{tag_line}")
         desc = (bm.description or "").strip()
-        if not desc:
-            chunks.append("  - 摘要：—")
-        else:
-            lines = desc.split("\n")
-            first = lines[0]
-            if len(lines) > 1:
-                rest = "\n".join("    " + ln for ln in lines[1:])
-                chunks.append(f"  - 摘要：{first}\n{rest}")
-            else:
-                chunks.append(f"  - 摘要：{first}")
+        if desc:
+            lines = [ln.rstrip() for ln in desc.split("\n")]
+            for ln in lines:
+                chunks.append(f"  > {ln}")
         chunks.append("")
     text = "\n".join(chunks).rstrip() + ("\n" if chunks else "")
     return text, count

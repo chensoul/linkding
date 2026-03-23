@@ -431,16 +431,20 @@ class BookmarkActionViewTestCase(
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertEqual(data["count"], 2)
-        self.assertIn("Example Article", data["markdown"])
-        self.assertIn("Useful Tool", data["markdown"])
         md = data["markdown"]
+        self.assertEqual(
+            md,
+            "- [Useful Tool](https://example.com/tool)\n"
+            "  > 一个可长期使用的在线工具。\n"
+            "\n"
+            "- [Example Article](https://example.com/article)\n"
+            "  > 这是一篇关于某个主题的资料。\n",
+        )
         self.assertLess(md.index("Useful Tool"), md.index("Example Article"))
-        self.assertIn("#reference", data["markdown"])
-        self.assertIn("#tool", data["markdown"])
-        self.assertIn("标签：", data["markdown"])
-        self.assertIn("摘要：", data["markdown"])
-        self.assertIn("](https://example.com/article)", data["markdown"])
-        self.assertIn("](https://example.com/tool)", data["markdown"])
+        self.assertNotIn("#reference", md)
+        self.assertNotIn("#tool", md)
+        self.assertNotIn("标签", md)
+        self.assertIn("  > ", md)
 
     def test_bulk_copy_markdown_empty_returns_400(self):
         response = self.client.post(
@@ -454,6 +458,54 @@ class BookmarkActionViewTestCase(
         self.assertEqual(response.status_code, 400)
         data = json.loads(response.content)
         self.assertIn("error", data)
+
+    def test_bulk_copy_markdown_multiline_summary_blockquote(self):
+        bm = self.setup_bookmark(
+            title="Multi",
+            url="https://example.com/m",
+            description="第一行。\n第二行。",
+        )
+        response = self.client.post(
+            reverse("linkding:bookmarks.index.action"),
+            {
+                "bulk_copy_markdown": ["1"],
+                "bookmark_id": [str(bm.id)],
+            },
+            HTTP_ACCEPT="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual(
+            data["markdown"],
+            "- [Multi](https://example.com/m)\n"
+            "  > 第一行。\n"
+            "  > 第二行。\n",
+        )
+
+    def test_bulk_copy_markdown_omits_summary_when_empty(self):
+        tag = self.setup_tag(name="ignored")
+        bm = self.setup_bookmark(
+            title="No Desc",
+            url="https://example.com/nodesc",
+            description="",
+            tags=[tag],
+        )
+        response = self.client.post(
+            reverse("linkding:bookmarks.index.action"),
+            {
+                "bulk_copy_markdown": ["1"],
+                "bookmark_id": [str(bm.id)],
+            },
+            HTTP_ACCEPT="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual(data["count"], 1)
+        self.assertEqual(
+            data["markdown"],
+            "- [No Desc](https://example.com/nodesc)\n",
+        )
+        self.assertNotIn("  > ", data["markdown"])
 
     def test_bulk_delete(self):
         bookmark1 = self.setup_bookmark()
