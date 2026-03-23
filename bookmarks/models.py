@@ -8,6 +8,7 @@ from datetime import date, datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -310,7 +311,8 @@ class BookmarkSearch:
     def parse_relative_date_string(date_filter_relative_string: str) -> tuple[date | None, date | None]:
         if not date_filter_relative_string:
             return None, None
-        today = date.today()
+        # Match DateTimeField __date lookups (use current/TIME_ZONE), not naive date.today().
+        today = timezone.localdate()
         if date_filter_relative_string == "today":
             return today, today
         if date_filter_relative_string == "yesterday":

@@ -317,10 +317,10 @@ class BookmarkSearchModelTest(TestCase, BookmarkFactoryMixin):
             },
         )
 
-    @patch("bookmarks.models.date")
-    def test_parse_relative_date_string_last_week(self, mock_date):
+    @patch("bookmarks.models.timezone.localdate")
+    def test_parse_relative_date_string_last_week(self, mock_localdate):
         """Last week is Monday–Sunday of the calendar week before the current one."""
-        mock_date.today.return_value = date(2026, 3, 11)  # Wednesday
+        mock_localdate.return_value = date(2026, 3, 11)  # Wednesday
         start, end = BookmarkSearch.parse_relative_date_string("last_week")
         self.assertEqual(start, date(2026, 3, 2))  # Monday
         self.assertEqual(end, date(2026, 3, 8))  # Sunday

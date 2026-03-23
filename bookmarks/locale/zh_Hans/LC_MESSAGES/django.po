@@ -977,14 +977,13 @@ msgid ""
 "expressions (and, or, not). If you run into any issues with the new search, "
 "you can enable this option to temporarily switch back to the old search. "
 "Please report any issues you encounter with the new search on <a "
-"href=\"https://github.com/sissbruecker/linkding/issues\" "
-"target=\"_blank\">GitHub</a> so they can be addressed. This option will be "
-"removed in a future version."
+"href=\"https://github.com/chensoul/linkding/issues\" target=\"_blank\">GitHub</"
+"a> so they can be addressed. This option will be removed in a future version."
 msgstr ""
 "自 1.44.0 起，linkding 使用支持逻辑表达式（and、or、not）的新搜索引擎。若遇问"
 "题可启用此选项暂时切回旧版。请将问题反馈至 <a href=\"https://github.com/"
-"sissbruecker/linkding/issues\" target=\"_blank\">GitHub</a>。此选项将在未来版"
-"本中移除。"
+"chensoul/linkding/issues\" target=\"_blank\">GitHub</a>。此选项将在未来版本中"
+"移除。"
 
 #: bookmarks/templates/settings/general.html:117
 msgid "Tag grouping"
@@ -1275,12 +1274,12 @@ msgstr ""
 
 #: bookmarks/templates/settings/integrations.html:25
 msgid ""
-"The extension is <a href=\"https://github.com/sissbruecker/linkding-"
-"extension\" target=\"_blank\">open source</a> as well, which enables you to "
-"build and manually load it into any browser that supports Chrome extensions."
+"The extension is <a href=\"https://github.com/chensoul/linkding-extension\" "
+"target=\"_blank\">open source</a> as well, which enables you to build and "
+"manually load it into any browser that supports Chrome extensions."
 msgstr ""
-"扩展为 <a href=\"https://github.com/sissbruecker/linkding-extension\" "
-"target=\"_blank\">开源</a>，可自行构建并加载到支持 Chrome 扩展的浏览器。"
+"扩展为 <a href=\"https://github.com/chensoul/linkding-extension\" target="
+"\"_blank\">开源</a>，可自行构建并加载到支持 Chrome 扩展的浏览器。"
 
 #: bookmarks/templates/settings/integrations.html:27
 msgid "Bookmarklet"
@@ -1309,8 +1308,6 @@ msgid "Drag the bookmarklet below into your browser's bookmark bar / toolbar"
 msgstr "将下方书签小工具拖到浏览器书签栏"
 
 #: bookmarks/templates/settings/integrations.html:36
-#, fuzzy
-#| msgid "Enter the name of the tag you want to keep"
 msgid "Open the website that you want to bookmark"
 msgstr "打开要添加书签的网站"
 
