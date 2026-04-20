@@ -32,9 +32,11 @@ RUN apk add --no-cache \
     openssl-dev \
     rust \
     cargo \
-    gettext
+    gettext \
+    curl
 WORKDIR /etc/linkding
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    cp /root/.local/bin/uv /usr/local/bin/uv
 RUN uv venv /etc/linkding/.venv
 COPY pyproject.toml uv.lock ./
 ENV VIRTUAL_ENV=/etc/linkding/.venv PATH="/etc/linkding/.venv/bin:$PATH"

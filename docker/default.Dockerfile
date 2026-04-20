@@ -22,10 +22,11 @@ RUN apk add --no-cache curl jq unzip && \
 # Build stage: Python dependencies (Debian)
 FROM python:3.13.7-slim-trixie AS build-deps
 RUN apt-get update && apt-get -y install --no-install-recommends \
-    build-essential pkg-config libpq-dev libicu-dev libsqlite3-dev libffi-dev wget unzip gettext && \
+    build-essential pkg-config libpq-dev libicu-dev libsqlite3-dev libffi-dev wget unzip gettext curl && \
     rm -rf /var/lib/apt/lists/*
 WORKDIR /etc/linkding
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    cp /root/.local/bin/uv /usr/local/bin/uv
 RUN uv venv /etc/linkding/.venv
 COPY pyproject.toml uv.lock ./
 ENV VIRTUAL_ENV=/etc/linkding/.venv PATH="/etc/linkding/.venv/bin:$PATH"
