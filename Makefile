@@ -1,4 +1,4 @@
-.PHONY: serve
+.PHONY: init serve tasks test lint format prepare-e2e e2e frontend
 
 init:
 	uv sync
