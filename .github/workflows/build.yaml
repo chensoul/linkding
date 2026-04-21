@@ -41,24 +41,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Cache npm dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: npm-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            npm-
-
-      - name: Cache uv dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            /home/runner/.cache/uv
-            ~/.cache/uv
-          key: uv-${{ hashFiles('uv.lock') }}
-          restore-keys: |
-            uv-
-
       - name: Get version
         id: get_version
         run: echo "version=$(cat version.txt)" >> $GITHUB_OUTPUT
@@ -78,12 +60,17 @@ jobs:
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
           driver: docker-container
           cache-binary: true
+          driver-opts: |
+            image=moby/buildkit:latest
+            network=host
           buildkitd-config-inline: |
             [worker.oci]
               max-parallelism = 8
