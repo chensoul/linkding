@@ -10,6 +10,17 @@ version=$(<version.txt)
 # Local build uses linux/amd64 only. For multi-arch builds, use GitHub Actions.
 PLATFORM="linux/amd64"
 
+# Set registry (default: Docker Hub)
+REGISTRY="${REGISTRY:-docker.io}"
+USERNAME="${DOCKER_USERNAME:-}"
+PASSWORD="${DOCKER_PASSWORD:-}"
+
+# Login to registry if credentials are provided
+if [ -n "$USERNAME" ] && [ -n "$PASSWORD" ]; then
+  echo "Logging in to $REGISTRY..."
+  echo "$PASSWORD" | docker login "$REGISTRY" -u "$USERNAME" --password-stdin
+fi
+
 echo "Building Debian images..."
 docker build --target linkding --platform $PLATFORM \
   -f docker/default.Dockerfile \
@@ -19,6 +30,11 @@ docker build --target linkding --platform $PLATFORM \
   --cache-to type=local,dest=/tmp/.buildx-cache-debian,mode=max \
   .
 
+if [ -n "$USERNAME" ]; then
+  docker push zhijunio/linkding:latest
+  docker push zhijunio/linkding:${version}
+fi
+
 docker build --target linkding-plus --platform $PLATFORM \
   -f docker/default.Dockerfile \
   -t zhijunio/linkding:latest-plus \
@@ -26,6 +42,11 @@ docker build --target linkding-plus --platform $PLATFORM \
   --cache-from type=local,src=/tmp/.buildx-cache-debian \
   --cache-to type=local,dest=/tmp/.buildx-cache-debian,mode=max \
   .
+
+if [ -n "$USERNAME" ]; then
+  docker push zhijunio/linkding:latest-plus
+  docker push zhijunio/linkding:${version}-plus
+fi
 
 echo "Building Alpine images..."
 docker build --target linkding --platform $PLATFORM \
@@ -36,6 +57,11 @@ docker build --target linkding --platform $PLATFORM \
   --cache-to type=local,dest=/tmp/.buildx-cache-alpine,mode=max \
   .
 
+if [ -n "$USERNAME" ]; then
+  docker push zhijunio/linkding:latest-alpine
+  docker push zhijunio/linkding:${version}-alpine
+fi
+
 docker build --target linkding-plus --platform $PLATFORM \
   -f docker/alpine.Dockerfile \
   -t zhijunio/linkding:latest-plus-alpine \
@@ -44,9 +70,15 @@ docker build --target linkding-plus --platform $PLATFORM \
   --cache-to type=local,dest=/tmp/.buildx-cache-alpine,mode=max \
   .
 
+if [ -n "$USERNAME" ]; then
+  docker push zhijunio/linkding:latest-plus-alpine
+  docker push zhijunio/linkding:${version}-plus-alpine
+fi
+
 echo ""
 echo "Build completed! Images:"
 docker images zhijunio/linkding --format "{{.Repository}}:{{.Tag}} - {{.Size}}" | grep -v test
 
 echo ""
 echo "Note: BuildKit local cache is stored in /tmp/.buildx-cache-*"
+echo "      Set DOCKER_USERNAME and DOCKER_PASSWORD to push images."
