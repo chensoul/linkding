@@ -68,6 +68,9 @@ jobs:
               enabled=true
               policyKeepTime=4320m
 
+      - name: Pull base image
+        run: docker pull ghcr.io/zhijunio/linkding:base-debian || true
+
       - name: Build and push ${{ matrix.name }}
         uses: docker/build-push-action@v6
         with:
@@ -85,5 +88,6 @@ jobs:
           sbom: false
           cache-from: |
             type=gha,scope=debian
+            type=registry,ref=ghcr.io/zhijunio/linkding:base-debian
           cache-to: |
             type=gha,scope=debian,mode=max
