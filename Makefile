@@ -20,7 +20,7 @@ lint:
 
 format:
 	uv run ruff format bookmarks
-	uv run djlint bookmarks/templates --reformat --quiet --warn
+	uv run python -m djlint bookmarks/templates --reformat --quiet --warn
 	npx prettier bookmarks/frontend --write
 	npx prettier bookmarks/styles --write
 
