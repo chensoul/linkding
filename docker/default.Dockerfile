@@ -2,7 +2,7 @@
 FROM node:22-alpine AS node-build
 WORKDIR /etc/linkding
 COPY package.json package-lock.json ./
-RUN npm ci && npm cache clean --force
+RUN npm ci
 COPY rollup.config.mjs postcss.config.js ./
 COPY bookmarks/frontend ./bookmarks/frontend/
 COPY bookmarks/styles ./bookmarks/styles/
@@ -30,7 +30,7 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
 RUN uv venv /etc/linkding/.venv
 COPY pyproject.toml uv.lock ./
 ENV VIRTUAL_ENV=/etc/linkding/.venv PATH="/etc/linkding/.venv/bin:$PATH"
-RUN uv sync --no-dev --group postgres --no-cache
+RUN uv sync --no-dev --group postgres
 
 # Build stage: ICU extension
 FROM build-deps AS compile-icu
