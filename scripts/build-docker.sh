@@ -15,25 +15,13 @@ REGISTRY="${REGISTRY:-docker.io}"
 USERNAME="${DOCKER_USERNAME:-}"
 PASSWORD="${DOCKER_PASSWORD:-}"
 
-# Push mode: set to "true" or non-empty to push images
-PUSH="${PUSH:-}"
-
 # Login to registry if credentials are provided
 if [ -n "$USERNAME" ] && [ -n "$PASSWORD" ]; then
   echo "Logging in to $REGISTRY..."
   echo "$PASSWORD" | docker login "$REGISTRY" -u "$USERNAME" --password-stdin
 fi
 
-# Set push flag for buildx
-if [ -n "$PUSH" ]; then
-  PUSH_FLAG="--push"
-  LOAD_FLAG=""
-  echo "Push mode: enabled"
-else
-  PUSH_FLAG=""
-  LOAD_FLAG="--load"
-  echo "Push mode: disabled (images loaded locally)"
-fi
+# Push mode: always push images
 
 echo "Building Debian images..."
 docker buildx build --platform $PLATFORM \
@@ -43,7 +31,7 @@ docker buildx build --platform $PLATFORM \
   --target linkding \
   --cache-from type=local,src=/tmp/.buildx-cache-debian \
   --cache-to type=local,dest=/tmp/.buildx-cache-debian,mode=max \
-  $PUSH_FLAG $LOAD_FLAG \
+  --push \
   .
 
 docker buildx build --platform $PLATFORM \
@@ -53,7 +41,7 @@ docker buildx build --platform $PLATFORM \
   --target linkding-plus \
   --cache-from type=local,src=/tmp/.buildx-cache-debian \
   --cache-to type=local,dest=/tmp/.buildx-cache-debian,mode=max \
-  $PUSH_FLAG $LOAD_FLAG \
+  --push \
   .
 
 echo "Building Alpine images..."
@@ -64,7 +52,7 @@ docker buildx build --platform $PLATFORM \
   --target linkding \
   --cache-from type=local,src=/tmp/.buildx-cache-alpine \
   --cache-to type=local,dest=/tmp/.buildx-cache-alpine,mode=max \
-  $PUSH_FLAG $LOAD_FLAG \
+  --push \
   .
 
 docker buildx build --platform $PLATFORM \
@@ -74,17 +62,12 @@ docker buildx build --platform $PLATFORM \
   --target linkding-plus \
   --cache-from type=local,src=/tmp/.buildx-cache-alpine \
   --cache-to type=local,dest=/tmp/.buildx-cache-alpine,mode=max \
-  $PUSH_FLAG $LOAD_FLAG \
+  --push \
   .
 
 echo ""
 echo "Build completed!"
-if [ -z "$PUSH" ]; then
-  echo "Images:"
-  docker images zhijunio/linkding --format "{{.Repository}}:{{.Tag}} - {{.Size}}" | grep -v test
-fi
-
 echo ""
 echo "Note: BuildKit local cache is stored in /tmp/.buildx-cache-*"
-echo "      Set PUSH=1 to push images (requires DOCKER_USERNAME/PASSWORD)."
+echo "      Set DOCKER_USERNAME and DOCKER_PASSWORD to push images."
 echo "      Set PLATFORM=linux/amd64,linux/arm64 for multi-arch builds."
