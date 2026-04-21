@@ -7,18 +7,19 @@ RUN --mount=type=cache,target=/root/.npm,id=npm-cache \
 COPY rollup.config.mjs postcss.config.js ./
 COPY bookmarks/frontend ./bookmarks/frontend/
 COPY bookmarks/styles ./bookmarks/styles/
-RUN npm run build
+RUN --mount=type=cache,target=node_modules,id=npm-build \
+    npm run build
 
 # Build stage: uBlock Origin Lite
 FROM node:22-alpine AS ublock-build
 WORKDIR /etc/linkding
 ARG UBOL_TAG=2026.308.1810
-RUN apk add --no-cache curl jq unzip && \
-    if curl -sLf "https://github.com/uBlockOrigin/uBOL-home/releases/download/${UBOL_TAG}/uBOLite_${UBOL_TAG}.chromium.zip" -o uBOLite.zip; then \
-      unzip -q uBOLite.zip -d uBOLite.chromium.mv3 && rm uBOLite.zip && \
-      jq '.declarative_net_request.rule_resources |= map(if .id == "annoyances-overlays" or .id == "annoyances-cookies" or .id == "annoyances-social" or .id == "annoyances-widgets" or .id == "annoyances-others" then .enabled = true else . end)' \
-          uBOLite.chromium.mv3/manifest.json > temp.json && mv temp.json uBOLite.chromium.mv3/manifest.json; \
-    fi && \
+RUN --mount=type=cache,target=/var/cache/apk,id=ublock-apk \
+    apk add --no-cache curl jq unzip && \
+    curl -sLf "https://github.com/uBlockOrigin/uBOL-home/releases/download/${UBOL_TAG}/uBOLite_${UBOL_TAG}.chromium.zip" -o uBOLite.zip && \
+    unzip -q uBOLite.zip -d uBOLite.chromium.mv3 && rm uBOLite.zip && \
+    jq '.declarative_net_request.rule_resources |= map(if .id == "annoyances-overlays" or .id == "annoyances-cookies" or .id == "annoyances-social" or .id == "annoyances-widgets" or .id == "annoyances-others" then .enabled = true else . end)' \
+        uBOLite.chromium.mv3/manifest.json > temp.json && mv temp.json uBOLite.chromium.mv3/manifest.json && \
     rm -rf /var/cache/apk/*
 
 # Build stage: Python dependencies (Debian)
