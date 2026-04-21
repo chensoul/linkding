@@ -477,9 +477,7 @@ class BookmarkActionViewTestCase(
         data = json.loads(response.content)
         self.assertEqual(
             data["markdown"],
-            "- [Multi](https://example.com/m)\n"
-            "  > 第一行。\n"
-            "  > 第二行。\n",
+            "- [Multi](https://example.com/m)\n  > 第一行。\n  > 第二行。\n",
         )
 
     def test_bulk_copy_markdown_omits_summary_when_empty(self):

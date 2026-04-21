@@ -8,8 +8,12 @@
           <div class="list-item-text {{ asset.text_classes }}">
             <span class="truncate">
               {{ asset.display_name }}
-              {% if asset.status == 'pending' %}{% trans "(queued)" %}{% endif %}
-              {% if asset.status == 'failure' %}{% trans "(failed)" %}{% endif %}
+              {% if asset.status == 'pending' %}
+                {% trans "(queued)" %}
+              {% endif %}
+              {% if asset.status == 'failure' %}
+                {% trans "(failed)" %}
+              {% endif %}
             </span>
             {% if asset.file_size %}<span class="filesize">{{ asset.file_size|filesizeformat }}</span>{% endif %}
           </div>

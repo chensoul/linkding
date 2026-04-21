@@ -102,9 +102,13 @@ class BundleNewViewTestCase(TestCase, BookmarkFactoryMixin, HtmlTestMixin):
         date_filter_relative = soup.select_one(
             'select[name="bundle_date_filter_relative_string"]'
         )
-        selected_by = date_filter_by.select_one("option[selected]") if date_filter_by else None
+        selected_by = (
+            date_filter_by.select_one("option[selected]") if date_filter_by else None
+        )
         selected_relative = (
-            date_filter_relative.select_one("option[selected]") if date_filter_relative else None
+            date_filter_relative.select_one("option[selected]")
+            if date_filter_relative
+            else None
         )
         self.assertIsNotNone(selected_by)
         self.assertEqual(selected_by.get("value"), "added")

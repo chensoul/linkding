@@ -308,7 +308,9 @@ class BookmarkSearch:
     }
 
     @staticmethod
-    def parse_relative_date_string(date_filter_relative_string: str) -> tuple[date | None, date | None]:
+    def parse_relative_date_string(
+        date_filter_relative_string: str,
+    ) -> tuple[date | None, date | None]:
         if not date_filter_relative_string:
             return None, None
         # Match DateTimeField __date lookups (use current/TIME_ZONE), not naive date.today().
@@ -393,8 +395,12 @@ class BookmarkSearch:
         self.date_filter_relative_string = (
             date_filter_relative_string or self.defaults["date_filter_relative_string"]
         )
-        self.__dict__["date_filter_start"] = date_filter_start or self.defaults["date_filter_start"]
-        self.__dict__["date_filter_end"] = date_filter_end or self.defaults["date_filter_end"]
+        self.__dict__["date_filter_start"] = (
+            date_filter_start or self.defaults["date_filter_start"]
+        )
+        self.__dict__["date_filter_end"] = (
+            date_filter_end or self.defaults["date_filter_end"]
+        )
 
     @property
     def date_filter_start(self) -> date | None:
@@ -438,9 +444,9 @@ class BookmarkSearch:
 
     def is_modified(self, param):
         value = self.__dict__.get(param)
-        if (
-            self.date_filter_type == self.FILTER_DATE_TYPE_RELATIVE
-            and param in ("date_filter_start", "date_filter_end")
+        if self.date_filter_type == self.FILTER_DATE_TYPE_RELATIVE and param in (
+            "date_filter_start",
+            "date_filter_end",
         ):
             return False
         return value != self.defaults.get(param)

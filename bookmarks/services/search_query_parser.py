@@ -16,6 +16,7 @@ class TokenType(Enum):
     RPAREN = "RPAREN"
     EOF = "EOF"
 
+
 # Valid scope values for in:field syntax
 VALID_SCOPES = frozenset({"title", "description", "notes", "url"})
 
@@ -189,7 +190,9 @@ class SearchExpression:
 @dataclass
 class TermExpression(SearchExpression):
     term: str
-    scope: str | None = None  # One of: title, description, notes, url. None = all fields
+    scope: str | None = (
+        None  # One of: title, description, notes, url. None = all fields
+    )
 
 
 @dataclass

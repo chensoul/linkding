@@ -4,15 +4,22 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('bookmarks', '0055_bookmarkbundle_search_params'),
+        ("bookmarks", "0055_bookmarkbundle_search_params"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='userprofile',
-            name='tag_grouping',
-            field=models.CharField(choices=[('alphabetical', 'Alphabetical'), ('disabled', 'Disabled'), ('pinyin', 'Pinyin')], default='alphabetical', max_length=12),
+            model_name="userprofile",
+            name="tag_grouping",
+            field=models.CharField(
+                choices=[
+                    ("alphabetical", "Alphabetical"),
+                    ("disabled", "Disabled"),
+                    ("pinyin", "Pinyin"),
+                ],
+                default="alphabetical",
+                max_length=12,
+            ),
         ),
     ]

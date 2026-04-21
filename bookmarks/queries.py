@@ -260,16 +260,12 @@ def _base_bookmarks_query(
         query_set = _filter_search_query(query_set, search.q, profile)
 
     # Effective params: use bundle overrides when viewing a bundle
-    overrides = (
-        search.bundle.get_search_overrides() if search.bundle else {}
-    )
+    overrides = search.bundle.get_search_overrides() if search.bundle else {}
     effective_unread = overrides.get("unread", search.unread)
     effective_shared = overrides.get("shared", search.shared)
     effective_tagged = overrides.get("tagged", search.tagged)
     effective_sort = overrides.get("sort", search.sort)
-    effective_date_filter_by = overrides.get(
-        "date_filter_by", search.date_filter_by
-    )
+    effective_date_filter_by = overrides.get("date_filter_by", search.date_filter_by)
     effective_date_filter_type = overrides.get(
         "date_filter_type", search.date_filter_type
     )
@@ -279,9 +275,7 @@ def _base_bookmarks_query(
     effective_date_filter_start = overrides.get(
         "date_filter_start", search.date_filter_start
     )
-    effective_date_filter_end = overrides.get(
-        "date_filter_end", search.date_filter_end
-    )
+    effective_date_filter_end = overrides.get("date_filter_end", search.date_filter_end)
 
     # Unread filter
     if effective_unread == BookmarkSearch.FILTER_UNREAD_YES:

@@ -88,7 +88,9 @@ def update(request: HttpRequest):
             if count > 0:
                 messages.success(
                     request,
-                    gettext("Queued %(count)s missing snapshots. This may take a while...")
+                    gettext(
+                        "Queued %(count)s missing snapshots. This may take a while..."
+                    )
                     % {"count": count},
                     "settings_success_message",
                 )
@@ -110,7 +112,9 @@ def update_profile(request: HttpRequest):
     form = UserProfileForm(request.POST, instance=profile)
     if form.is_valid():
         form.save()
-        messages.success(request, gettext("Profile updated"), "settings_success_message")
+        messages.success(
+            request, gettext("Profile updated"), "settings_success_message"
+        )
         # Load missing favicons if the feature was just enabled
         if profile.enable_favicons and not favicons_were_enabled:
             tasks.schedule_bookmarks_without_favicons(request.user)

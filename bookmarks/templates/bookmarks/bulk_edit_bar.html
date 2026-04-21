@@ -22,7 +22,9 @@
       <option value="bulk_unshare">{% trans "Unshare" %}</option>
     {% endif %}
     <option value="bulk_refresh">{% trans "Refresh from website" %}</option>
-    {% if bookmark_list.snapshot_feature_enabled %}<option value="bulk_snapshot">{% trans "Create HTML snapshot" %}</option>{% endif %}
+    {% if bookmark_list.snapshot_feature_enabled %}
+      <option value="bulk_snapshot">{% trans "Create HTML snapshot" %}</option>
+    {% endif %}
   </select>
   <ld-tag-autocomplete input-name="bulk_tag_string"
                        input-placeholder="{% trans 'Tag names...' %}"

@@ -88,7 +88,9 @@ class ConfirmDropdown extends LitElement {
         <button type="submit" class="btn btn-error" @click=${this.confirm}>
           ${confirmLabel}
         </button>
-        <button type="button" class="btn" @click=${this.close}>${cancelLabel}</button>
+        <button type="button" class="btn" @click=${this.close}>
+          ${cancelLabel}
+        </button>
         <div class="menu-arrow"></div>
       </div>
     `;

@@ -27,7 +27,10 @@ def action(request: HttpRequest):
         bundle = access.bundle_write(request, remove_bundle_id)
         bundle_name = bundle.name
         bundles.delete_bundle(bundle)
-        messages.success(request, gettext("Bundle '%(name)s' removed successfully.") % {"name": bundle_name})
+        messages.success(
+            request,
+            gettext("Bundle '%(name)s' removed successfully.") % {"name": bundle_name},
+        )
 
     elif "move_bundle" in request.POST:
         bundle_id = request.POST.get("move_bundle")

@@ -97,17 +97,18 @@ class BookmarkPage extends HeadlessElement {
 
     // Collect IDs of previously rendered bookmarks
     const oldItemIds = new Set(
-      Array.from(oldItems).map((item) => item.dataset.bookmarkId)
+      Array.from(oldItems).map((item) => item.dataset.bookmarkId),
     );
 
     // Collect IDs of currently rendered bookmarks
     const currentItemIds = new Set(
-      Array.from(items).map((item) => item.dataset.bookmarkId)
+      Array.from(items).map((item) => item.dataset.bookmarkId),
     );
 
     // Check if the bookmark list has changed (indicating a bulk action was executed)
-    const hasListChanged = oldItemIds.size !== currentItemIds.size ||
-      !Array.from(oldItemIds).every(id => currentItemIds.has(id));
+    const hasListChanged =
+      oldItemIds.size !== currentItemIds.size ||
+      !Array.from(oldItemIds).every((id) => currentItemIds.has(id));
 
     // Save previously checked bookmark ids that are still in the current list
     // Only preserve state if the list hasn't changed (no bulk action executed)
@@ -147,7 +148,10 @@ class BookmarkPage extends HeadlessElement {
     this.allCheckbox?.addEventListener("change", this.onToggleAll);
     this.bookmarkCheckboxes.forEach((checkbox) => {
       // Restore checked state only if list hasn't changed (no bulk action executed)
-      if (checkedBookmarkIds.size > 0 && checkedBookmarkIds.has(checkbox.value)) {
+      if (
+        checkedBookmarkIds.size > 0 &&
+        checkedBookmarkIds.has(checkbox.value)
+      ) {
         checkbox.checked = true;
       } else {
         checkbox.checked = false;

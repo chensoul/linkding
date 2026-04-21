@@ -473,7 +473,7 @@ class TagGroup:
             """Get the group character for a tag based on pinyin or first letter."""
             tag_name = tag.name
             first_char = tag_name[0]
-            
+
             # Check if the first character is Chinese
             if CJK_RE.match(first_char):
                 # Get pinyin first letter
@@ -500,7 +500,7 @@ class TagGroup:
 
         for tag in sorted_tags:
             group_char = get_group_char(tag)
-            
+
             if not group or group.char != group_char:
                 group = TagGroup(context, group_char)
                 groups.append(group)

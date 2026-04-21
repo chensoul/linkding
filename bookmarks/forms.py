@@ -309,9 +309,9 @@ class BookmarkBundleForm(forms.ModelForm):
             self.fields["bundle_date_filter_by"].initial = self.initial.get(
                 "bundle_date_filter_by", ""
             )
-            self.fields["bundle_date_filter_relative_string"].initial = self.initial.get(
-                "bundle_date_filter_relative_string", ""
-            )
+            self.fields[
+                "bundle_date_filter_relative_string"
+            ].initial = self.initial.get("bundle_date_filter_relative_string", "")
 
     def save(self, commit=True):
         instance = super().save(commit=False)
@@ -343,6 +343,7 @@ class BookmarkBundleForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
 
 class BookmarkSearchForm(forms.Form):
     SORT_CHOICES = [

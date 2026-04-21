@@ -61,9 +61,7 @@ class WebsiteLoaderTestCase(TestCase):
             else ""
         )
         meta_itemprop = (
-            f'<meta itemprop="name" content="{itemprop_name}">'
-            if itemprop_name
-            else ""
+            f'<meta itemprop="name" content="{itemprop_name}">' if itemprop_name else ""
         )
         return f"""
         <!DOCTYPE html>

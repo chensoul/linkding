@@ -4,7 +4,8 @@
     <h2 id="tags-heading">{% trans "Tags" %}</h2>
     {% if user.is_authenticated %}
       <ld-dropdown class="dropdown dropdown-right ml-auto">
-        <button class="btn btn-noborder dropdown-toggle" aria-label="{% trans 'Tags menu' %}">
+        <button class="btn btn-noborder dropdown-toggle"
+                aria-label="{% trans 'Tags menu' %}">
           <svg width="20" height="20">
             <use href="{% static 'icons.svg' %}?v={{ app_version }}#menu"></use>
           </svg>

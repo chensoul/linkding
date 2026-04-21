@@ -70,7 +70,10 @@ def tag_new(request: HttpRequest):
     if request.method == "POST":
         if form.is_valid():
             tag = form.save()
-            messages.success(request, gettext('Tag "%(name)s" created successfully.') % {"name": tag.name})
+            messages.success(
+                request,
+                gettext('Tag "%(name)s" created successfully.') % {"name": tag.name},
+            )
             return HttpResponseRedirect(reverse("linkding:tags.index"))
         else:
             return turbo.stream(
@@ -151,8 +154,14 @@ def tag_merge(request: HttpRequest):
 
                 messages.success(
                     request,
-                    gettext('Successfully merged %(count)s tags (%(tag_names)s) into "%(target)s".')
-                    % {"count": len(merge_tags), "tag_names": ", ".join(tag_names), "target": target_tag.name},
+                    gettext(
+                        'Successfully merged %(count)s tags (%(tag_names)s) into "%(target)s".'
+                    )
+                    % {
+                        "count": len(merge_tags),
+                        "tag_names": ", ".join(tag_names),
+                        "target": target_tag.name,
+                    },
                 )
 
             return HttpResponseRedirect(reverse("linkding:tags.index"))

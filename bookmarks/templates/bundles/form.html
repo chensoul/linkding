@@ -56,8 +56,7 @@
          name="save"
          value="{% trans 'Save' %}"
          class="btn btn-primary btn-wide">
-  <a href="{% url 'linkding:bundles.index' %}"
-     class="btn btn-wide">{% trans "Cancel" %}</a>
+  <a href="{% url 'linkding:bundles.index' %}" class="btn btn-wide">{% trans "Cancel" %}</a>
   <a href="{% url 'linkding:bundles.preview' %}"
      data-turbo-frame="preview"
      class="d-none"
@@ -101,6 +100,7 @@
     // Toggle tag input visibility when "Has tags" is selected
     const filterTaggedSelect = bundleForm.querySelector('[name="filter_tagged"]');
     const tagsInputDiv = bundleForm.querySelector('.bundle-tags-input');
+
     function toggleTagsInput() {
       if (tagsInputDiv) {
         tagsInputDiv.style.display = filterTaggedSelect?.value === 'yes' ? '' : 'none';
@@ -114,6 +114,7 @@
     // Toggle relative period visibility when date filter is set
     const dateBySelect = bundleForm.querySelector('[name="bundle_date_filter_by"]');
     const relativeDiv = bundleForm.querySelector('.bundle-date-relative');
+
     function toggleDateFilterUI() {
       if (relativeDiv) {
         relativeDiv.style.display = dateBySelect?.value ? '' : 'none';
