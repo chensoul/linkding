@@ -3,6 +3,9 @@
 # Remove previous container if exists
 docker rm -f linkding-postgres-test || true
 
+# Create data directory if it doesn't exist
+mkdir -p $(pwd)/tmp/postgres-data
+
 # Run postgres container
 docker run -d \
   -e POSTGRES_DB=linkding \
@@ -11,7 +14,7 @@ docker run -d \
   -p 5432:5432 \
   -v $(pwd)/tmp/postgres-data:/var/lib/postgresql/data \
   --name linkding-postgres-test \
-  postgres
+  postgres:15
 
 # Wait until postgres has started
 echo >&2 "$(date +%Y%m%dt%H%M%S) Waiting for postgres container"
@@ -21,6 +24,7 @@ sleep 15
 export LD_DB_ENGINE=postgres
 export LD_DB_USER=linkding
 export LD_DB_PASSWORD=linkding
+export LD_DB_HOST=localhost
 
 export LD_SUPERUSER_NAME=admin
 export LD_SUPERUSER_PASSWORD=admin

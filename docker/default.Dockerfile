@@ -7,8 +7,7 @@ RUN --mount=type=cache,target=/root/.npm,id=npm-cache \
 COPY rollup.config.mjs postcss.config.js ./
 COPY bookmarks/frontend ./bookmarks/frontend/
 COPY bookmarks/styles ./bookmarks/styles/
-RUN --mount=type=cache,target=node_modules,id=npm-build \
-    npm run build
+RUN npm run build
 
 # Build stage: uBlock Origin Lite
 FROM node:22-alpine AS ublock-build
@@ -67,16 +66,11 @@ ENV VIRTUAL_ENV=/etc/linkding/.venv PATH="/etc/linkding/.venv/bin:$PATH" LD_ENAB
 FROM build-deps AS static-build
 COPY --from=compile-icu /etc/linkding/libicu.so .
 COPY --from=node-build /etc/linkding/bookmarks/static bookmarks/static/
-COPY bookmarks/*.py ./bookmarks/
-COPY bookmarks/management bookmarks/management/
-COPY bookmarks/templates bookmarks/templates/
-COPY bookmarks/settings bookmarks/settings/
-COPY bookmarks/urls.py bookmarks/migrations.py ./bookmarks/
-COPY locale ./locale/
-COPY requirements.txt pyproject.toml uv.lock manage.py bootstrap.sh ./
+COPY bookmarks/ ./bookmarks/
+COPY pyproject.toml uv.lock manage.py bootstrap.sh uwsgi.ini version.txt ./
 COPY *.conf .
 ENV VIRTUAL_ENV=/etc/linkding/.venv PATH="/etc/linkding/.venv/bin:$PATH"
-RUN mkdir -p data && python manage.py collectstatic --noinput && python manage.py compilemessages
+RUN mkdir -p data && python manage.py collectstatic --noinput
 
 # Final stage: linkding (Debian)
 FROM python:3.13.7-slim-trixie AS linkding
@@ -86,27 +80,15 @@ RUN apt-get update && apt-get -y install --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 WORKDIR /etc/linkding
 COPY --from=build-deps /etc/linkding/.venv .venv/
-COPY --from=static-build /etc/linkding/libicu.so .
-COPY --from=static-build /etc/linkding/data ./data/
-COPY --from=static-build /etc/linkding/bookmarks/static bookmarks/static/
-COPY --from=static-build /etc/linkding/bookmarks/locale bookmarks/locale/
-COPY --from=static-build /etc/linkding/manage.py .
-COPY --from=static-build /etc/linkding/bootstrap.sh .
-COPY --from=static-build /etc/linkding/*.py .
-COPY --from=static-build /etc/linkding/*.conf .
+COPY --from=static-build /etc/linkding/ .
+ENV VIRTUAL_ENV=/etc/linkding/.venv PATH="/etc/linkding/.venv/bin:$PATH"
 HEALTHCHECK --interval=30s --retries=3 --timeout=1s CMD curl -f http://localhost:${LD_SERVER_PORT:-9090}/${LD_CONTEXT_PATH}health || exit 1
 CMD ["/bin/bash", "./bootstrap.sh"]
 
 # Final stage: linkding-plus (Debian)
 FROM linkding-plus-base AS linkding-plus
-COPY --from=static-build /etc/linkding/libicu.so .
-COPY --from=static-build /etc/linkding/data ./data/
-COPY --from=static-build /etc/linkding/bookmarks/static bookmarks/static/
-COPY --from=static-build /etc/linkding/bookmarks/locale bookmarks/locale/
+COPY --from=static-build /etc/linkding/ .
 COPY --from=ublock-build /etc/linkding/uBOLite.chromium.mv3 uBOLite.chromium.mv3/
-COPY --from=static-build /etc/linkding/manage.py .
-COPY --from=static-build /etc/linkding/bootstrap.sh .
-COPY --from=static-build /etc/linkding/*.py .
-COPY --from=static-build /etc/linkding/*.conf .
+ENV VIRTUAL_ENV=/etc/linkding/.venv PATH="/etc/linkding/.venv/bin:$PATH"
 HEALTHCHECK --interval=30s --retries=3 --timeout=1s CMD curl -f http://localhost:${LD_SERVER_PORT:-9090}/${LD_CONTEXT_PATH}health || exit 1
 CMD ["/bin/bash", "./bootstrap.sh"]
