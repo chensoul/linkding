@@ -93,8 +93,8 @@ jobs:
           target: ${{ matrix.target }}
           push: true
           provenance: false
+          sbom: false
           cache-from: |
             type=gha,scope=${{ matrix.cache_id }}
-            type=registry,ref=ghcr.io/zhijunio/linkding:buildcache-${{ matrix.cache_id }}
           cache-to: |
             type=gha,scope=${{ matrix.cache_id }},mode=max

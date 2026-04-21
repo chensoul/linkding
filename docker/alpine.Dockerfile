@@ -49,7 +49,8 @@ RUN --mount=type=cache,target=/root/.cache/uv,id=uv-cache \
 FROM build-deps AS compile-icu
 ARG SQLITE_RELEASE_YEAR=2023
 ARG SQLITE_RELEASE=3430000
-RUN wget -q https://www.sqlite.org/${SQLITE_RELEASE_YEAR}/sqlite-amalgamation-${SQLITE_RELEASE}.zip && \
+RUN --mount=type=cache,target=/var/cache/apk,id=apk-cache \
+    wget -q https://www.sqlite.org/${SQLITE_RELEASE_YEAR}/sqlite-amalgamation-${SQLITE_RELEASE}.zip && \
     unzip -q sqlite-amalgamation-${SQLITE_RELEASE}.zip && \
     cp sqlite-amalgamation-${SQLITE_RELEASE}/sqlite3.h . && \
     cp sqlite-amalgamation-${SQLITE_RELEASE}/sqlite3ext.h . && \
@@ -61,11 +62,12 @@ RUN wget -q https://www.sqlite.org/${SQLITE_RELEASE_YEAR}/sqlite-amalgamation-${
 FROM build-deps AS linkding-plus-base
 RUN apk add --no-cache \
     bash curl icu libpq mailcap libssl3 gettext nodejs npm chromium-swiftshader && \
-    npm install -g single-file-cli@2.0.75 && \
     addgroup -g 82 -S www-data 2>/dev/null || true && \
     adduser -u 82 -D -S -G www-data www-data 2>/dev/null || true && \
     mkdir -p chromium-profile && chown -R www-data:www-data chromium-profile && \
     rm -rf /var/cache/apk/*
+RUN --mount=type=cache,target=/root/.npm,id=npm-global \
+    npm install -g single-file-cli@2.0.75
 ENV VIRTUAL_ENV=/etc/linkding/.venv PATH="/etc/linkding/.venv/bin:$PATH" LD_ENABLE_SNAPSHOTS=True
 
 # Build stage: Static files and translations
