@@ -38,3 +38,6 @@ bookmarks/tests_e2e/
 **/*.sqlite3
 **/coverage.xml
 **/htmlcov/
+**/Dockerfile*
+.planning/
+*.log
