@@ -106,10 +106,8 @@ jobs:
           target: ${{ matrix.target }}
           push: true
           provenance: false
-          # Use both GHA cache (fast) and registry cache (persistent)
           cache-from: |
             type=gha,scope=${{ matrix.cache_id }}
             type=registry,ref=ghcr.io/zhijunio/linkding:buildcache-${{ matrix.cache_id }}
           cache-to: |
             type=gha,scope=${{ matrix.cache_id }},mode=max
-            type=registry,ref=ghcr.io/zhijunio/linkding:buildcache-${{ matrix.cache_id }},mode=max
