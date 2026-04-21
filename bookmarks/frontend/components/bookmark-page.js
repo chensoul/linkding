@@ -90,17 +90,35 @@ class BookmarkPage extends HeadlessElement {
     event.target.closest("li").classList.toggle("show-notes");
   }
 
-  updateBulkEdit() {
+  updateBulkEdit(items, oldItems) {
     if (this.hasAttribute("no-bulk-edit")) {
       return;
     }
 
+    // Collect IDs of previously rendered bookmarks
+    const oldItemIds = new Set(
+      Array.from(oldItems).map((item) => item.dataset.bookmarkId)
+    );
+
+    // Collect IDs of currently rendered bookmarks
+    const currentItemIds = new Set(
+      Array.from(items).map((item) => item.dataset.bookmarkId)
+    );
+
+    // Check if the bookmark list has changed (indicating a bulk action was executed)
+    const hasListChanged = oldItemIds.size !== currentItemIds.size ||
+      !Array.from(oldItemIds).every(id => currentItemIds.has(id));
+
+    // Save previously checked bookmark ids that are still in the current list
+    // Only preserve state if the list hasn't changed (no bulk action executed)
     const checkedBookmarkIds = new Set();
-    this.bookmarkCheckboxes?.forEach((checkbox) => {
-      if (checkbox.checked) {
-        checkedBookmarkIds.add(checkbox.value);
-      }
-    });
+    if (!hasListChanged) {
+      this.bookmarkCheckboxes?.forEach((checkbox) => {
+        if (checkbox.checked && currentItemIds.has(checkbox.value)) {
+          checkedBookmarkIds.add(checkbox.value);
+        }
+      });
+    }
 
     // Remove existing listeners
     this.activeToggle?.removeEventListener("click", this.onToggleBulkEdit);
@@ -128,16 +146,23 @@ class BookmarkPage extends HeadlessElement {
     this.actionSelect?.addEventListener("change", this.onBulkActionChange);
     this.allCheckbox?.addEventListener("change", this.onToggleAll);
     this.bookmarkCheckboxes.forEach((checkbox) => {
-      checkbox.checked = checkedBookmarkIds.has(checkbox.value);
+      // Restore checked state only if list hasn't changed (no bulk action executed)
+      if (checkedBookmarkIds.size > 0 && checkedBookmarkIds.has(checkbox.value)) {
+        checkbox.checked = true;
+      } else {
+        checkbox.checked = false;
+      }
       checkbox.addEventListener("change", this.onToggleBookmark);
     });
 
+    // Update select all checkbox
     const allRowsChecked =
       this.bookmarkCheckboxes.length > 0 &&
       this.bookmarkCheckboxes.every((checkbox) => checkbox.checked);
     if (this.allCheckbox) {
       this.allCheckbox.checked = allRowsChecked;
     }
+
     this.updateSelectAcross(allRowsChecked);
     this.updateExecuteButton();
 
